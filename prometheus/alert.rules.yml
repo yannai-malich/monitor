@@ -1,0 +1,21 @@
+groups:
+- name: alert.rules
+  rules:
+  - alert: InstancesDown
+    expr: up == 0
+    for: 1m
+    labels:
+      serverity: "critical"
+    annotations:
+      summary: "Endpoint {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has benn down for more than 1 minutes."
+  
+  - alert: HostOutOfDiskSpace
+    expr: (node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10 and ON (instance, device, mountpoint) node_filesystem_readonly == 0
+    for: 2m
+    labels:
+      severity: "warning"
+    annotations:
+      summary: "Host out of disk space (instance {{ $labels.instance }})"
+      description: "Disk is almost full (< 99% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
